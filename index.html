@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Fixed viewport to handle mobile screen boundaries correctly -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Pink Page</title>
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /* 100dvh prevents URL bar jumps on mobile safari/chrome */
+    min-height: 100dvh; 
+    overflow-x: hidden;
+  }
+
+  body {
+    background: linear-gradient(180deg, #ffd6e7 0%, #ffb3d1 100%);
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    color: #7a2a52;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Container that holds all the falling pictures, sits behind your content */
+  #falling {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .faller {
+    position: absolute;
+    top: -120px;
+    height: auto;
+    opacity: 0.9;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes fall {
+    from { transform: translateY(0) rotate(0deg); }
+    to   { transform: translateY(calc(100vh + 240px)) rotate(360deg); }
+  }
+
+  /* Your actual page content goes here */
+  main {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    margin: 0 0 0.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faller { animation: none; top: 20%; }
+  }
+
+  .card {
+    background: #fff7fb;
+    border: 6px solid #ff8fbf;
+    outline: 4px dotted #ffffff;
+    outline-offset: -14px;
+    border-radius: 32px;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 10px 0 #ff8fbf80, 0 20px 40px #ff6fa833;
+    text-align: center;
+  }
+
+  .gif-box {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    border: 4px solid #ffc2dc;
+    background: #ffe9f3;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+
+  .gif-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-text {
+    margin: 1.2rem 0;
+    font-size: clamp(1.1rem, 4vw, 1.4rem);
+    font-weight: bold;
+    color: #c2407e;
+    word-wrap: break-word;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0.8rem 1.8rem;
+    border: 4px solid #fff;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation; /* Removes 300ms tap delay on mobile */
+    min-width: 100px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn.yes {
+    background: #ff5fa2;
+    box-shadow: 0 6px 0 #d63d82;
+  }
+
+  .btn.no {
+    background: #9ec5ff;
+    box-shadow: 0 6px 0 #6f9fe6;
+  }
+
+  .btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid #7a2a52;
+    outline-offset: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div id="falling"></div>
+
+<main>
+  <div class="card">
+    <div class="gif-box">
+      <img src="cat.gif" alt="Cute cat gif">
+    </div>
+
+    <p class="card-text">Be my gf? 💕</p>
+
+    <div class="buttons">
+      <button class="btn yes" id="yes">Yes</button>
+      <button class="btn no" id="no">No</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  const images = [
+    "melody.png",
+    "cinnamoroll.png"
+  ];
+
+  // Reduced image count slightly for mobile performance
+  const COUNT = 15;   
+  const container = document.getElementById("falling");
+
+  for (let i = 0; i < COUNT; i++) {
+    const img = document.createElement("img");
+    img.src = images[i % images.length];
+    img.className = "faller";
+    img.alt = "";
+
+    const size = 30 + Math.random() * 40;            // adjusted size for mobile screens
+    img.style.width = size + "px";
+    img.style.left = Math.random() * 90 + "vw";     // safe horizontal bounds
+    img.style.animationDuration = 8 + Math.random() * 10 + "s";
+    img.style.animationDelay = -Math.random() * 18 + "s";
+
+    container.appendChild(img);
+  }
+
+  document.getElementById("yes").addEventListener("click", () => {
+    document.querySelector(".card-text").textContent = "Yay!! 🎀 (btw i get a notification on my phone when u click it lol)";
+    notify("They clicked YES");
+  });
+
+  document.getElementById("no").addEventListener("click", () => {
+    document.querySelector(".card-text").textContent = "oh well";
+    notify("They clicked NO");
+  });
+
+  const TOPIC = "maramyesno";
+
+  function notify(message) {
+    fetch("https://ntfy.sh/" + TOPIC, {
+      method: "POST",
+      body: message
+    }).catch(() => {});
+  }
+</script>
+
+</body>
+</html>
